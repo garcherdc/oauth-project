@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.OperationLogMapper">
+  <resultMap id="BaseResultMap" type="com.example.demo.entity.OperationLogDO">
+    <!--@mbg.generated-->
+    <!--@Table operation_log-->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="partner" jdbcType="VARCHAR" property="partner" />
+    <result column="user_name" jdbcType="VARCHAR" property="username" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="operation" jdbcType="TINYINT" property="operation" />
+    <result column="operation_time" jdbcType="BIGINT" property="operationTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, user_name, email, partner, `operation`,operation_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from operation_log
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="queryByCondition" parameterType="com.example.demo.req.OperationLogQueryReq" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select
+    <include refid="Base_Column_List" />
+    from operation_log
+    <where>
+      <if test="startTime != null ">
+        and operation_time >= #{startTime}
+      </if>
+      <if test="endTime != null ">
+        and operation_time &lt;= #{endTime}
+      </if>
+      <if test="(userNames != null and userNames.size() > 0) or (emails != null and emails.size() > 0)">
+        AND (
+        <if test="userNames != null and userNames.size() > 0">
+          (user_name IN
+          <foreach item="itemUserName" index="index" collection="userNames" open="(" separator=" OR " close=")">
+            #{itemUserName}
+          </foreach>)
+        </if>
+        <if test="emails != null and emails.size() > 0">
+          OR (email IN
+          <foreach item="itemEmail" index="index" collection="emails" open="(" separator=" OR " close=")">
+            #{itemEmail}
+          </foreach>)
+        </if>
+        )
+      </if>
+      <if test="operations != null and operations.size() > 0">
+        AND operation IN
+        <foreach item="itemOperation" index="index" collection="operations" open="(" separator="," close=")">
+          #{itemOperation}
+        </foreach>
+      </if>
+      <if test="partner != null and partner != ''">
+        AND partner = #{partner}
+      </if>
+    </where>
+    order by operation_time desc
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    <!--@mbg.generated-->
+    delete from operation_log
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.example.demo.entity.OperationLogDO" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into operation_log ( user_name, email, partner,
+      `operation`,`operation_time`)
+    values ( #{username,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},#{partner,jdbcType=VARCHAR},
+      #{operation,jdbcType=INTEGER},#{operationTime,jdbcType=TIMESTAMP})
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.example.demo.entity.OperationLogDO">
+    <!--@mbg.generated-->
+    update operation_log
+    <set>
+      <if test="username != null">
+        user_name = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="operation != null">
+        `operation` = #{operation,jdbcType=INTEGER},
+      </if>
+      <if test="operationTime != null">
+        `operation_time` = #{operationTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+</mapper>
